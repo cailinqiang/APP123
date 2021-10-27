@@ -10,33 +10,41 @@ namespace 数据库扩展.类库
 {
     public enum 数源种类
     {
+        Access,
+        Excel,
+        MySql,
+        Npgsql,
         Odbc,
         OleDb,
         SqlClient,
         SQLite,
-        PostgreSql,
-        Access,
-        Excel,
         NullSql
     }
     class 数源
     {
-
         public static DbProviderFactory 提供者(数源种类 源类型)
         {
-            switch(源类型)
+            return 源类型 switch
             {
-                case 数源种类.Odbc:
-                    return System.Data.Odbc.OdbcFactory.Instance;
-                case 数源种类.OleDb:
-                    return System.Data.OleDb.OleDbFactory.Instance;
-                case 数源种类.SqlClient:
-                    return System.Data.SqlClient.SqlClientFactory.Instance;
-                case 数源种类.NullSql:
-                    return null;
-                default:
-                    return System.Data.OleDb.OleDbFactory.Instance;
-            }
+                数源种类.Odbc => System.Data.Odbc.OdbcFactory.Instance,
+                数源种类.OleDb => System.Data.OleDb.OleDbFactory.Instance,
+                数源种类.SqlClient => System.Data.SqlClient.SqlClientFactory.Instance,
+                数源种类.MySql => MySql.Data.MySqlClient.MySqlClientFactory.Instance,
+                数源种类.Npgsql => Npgsql.NpgsqlFactory.Instance,
+                数源种类.NullSql => null,
+                _ => System.Data.OleDb.OleDbFactory.Instance,
+            };
+        }
+        public static DbProviderFactory 提供者(String 源类型)
+        {
+            return 提供者(转枚举(源类型));
+        }
+        private static 数源种类 转枚举(string 源类型)
+        {
+            if(String.IsNullOrEmpty(源类型)) return 数源种类.NullSql;
+            数源种类 Result;
+            if(Enum.TryParse<数源种类>(源类型, out Result)) return Result;
+            else return 数源种类.NullSql;
         }
         public static DbCommand 命令器(数源种类 源类型) => 提供者(源类型)?.CreateCommand();
         public static DbCommandBuilder 命令生成器(数源种类 源类型) => 提供者(源类型)?.CreateCommandBuilder();
@@ -46,12 +54,7 @@ namespace 数据库扩展.类库
         public static DbDataSourceEnumerator 命令(数源种类 源类型) => 提供者(源类型)?.CreateDataSourceEnumerator();
         public static DbParameter 命令参数(数源种类 源类型) => 提供者(源类型)?.CreateParameter();
 
-        private static 数源种类 匹配(string 源类型)
-        {
-            if(String.IsNullOrEmpty(源类型)) return 数源种类.NullSql;
-            if(Enum.TryParse(typeof(数源种类), 源类型, out object Result)) return (数源种类)Result;
-            else return 数源种类.NullSql;
-        }
+
 
         public static String 生成连接串(数源种类 源类型, string 驱动名, string 服务器, string 数据库, string 用户, string 密码, bool 集成验证 = false)
         {
@@ -89,7 +92,7 @@ namespace 数据库扩展.类库
         {
             if(String.IsNullOrEmpty(源类型) || String.IsNullOrEmpty(连接串)) return null;
 
-            var conn = 连接器(匹配(源类型));
+            var conn = 连接器(转枚举(源类型));
             conn.ConnectionString = 连接串;
             return conn;
         }
@@ -97,7 +100,7 @@ namespace 数据库扩展.类库
         {
             if(String.IsNullOrEmpty(源类型) || String.IsNullOrEmpty(命令串)) return null;
 
-            var comm = 命令器(匹配(源类型));
+            var comm = 命令器(转枚举(源类型));
             comm.CommandText = 命令串;
             return comm;
         }
@@ -114,10 +117,10 @@ namespace 数据库扩展.类库
         {
             if(String.IsNullOrEmpty(源类型) || String.IsNullOrEmpty(连接串) || String.IsNullOrEmpty(命令串)) return null;
 
-            var adapter = 适配器(匹配(源类型));
+            var adapter = 适配器(转枚举(源类型));
             var comm = 命令器( 源类型,  连接串,  命令串);
             adapter.SelectCommand = comm;
-            var cmdb = 命令生成器(匹配(源类型));
+            var cmdb = 命令生成器(转枚举(源类型));
             cmdb.DataAdapter = adapter;
             //据说以下三条可以不写，cmdb与ad一对一绑定，自动生成！
             //adapter.DeleteCommand = cmdb.GetDeleteCommand();
