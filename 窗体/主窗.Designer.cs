@@ -1,7 +1,7 @@
 ﻿
 namespace 数据库扩展
 {
-    partial class 主窗
+    partial class 运行窗体
     {
         /// <summary>
         ///  Required designer variable.

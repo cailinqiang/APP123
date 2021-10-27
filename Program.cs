@@ -14,7 +14,7 @@ namespace 数据库扩展
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new 主窗());
+            Application.Run(new 运行窗体());
         }
     }
 

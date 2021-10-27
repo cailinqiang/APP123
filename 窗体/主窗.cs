@@ -1,13 +1,22 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Windows.Forms;
+using 数据库扩展.类库;
 
 namespace 数据库扩展
 {
-    public partial class 主窗 : Form
+    public partial class 运行窗体 : Form
     {
-        public 主窗()
+        public 运行窗体()
         {
             InitializeComponent();
-            执行任务1();
+            执行任务4();
+        }
+
+        private void 执行任务4()
+        {
+            var 连接串= 数源.生成连接串(数源种类.OleDb,"Microsoft.Jet.Oledb.4.0",null,@"c:\MyData\Workgroup.mdb","cailin","123456");
+            var 类别 = 数源.命令器(数源种类.Excel)?.ToString();
+            MessageBox.Show(类别, "OleDbConnection");
         }
 
         private void 执行任务3()

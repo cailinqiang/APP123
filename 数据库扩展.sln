@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31729.503
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "数据库扩展", "数据库扩展.csproj", "{C6620178-47A4-40AA-B29B-AEC485EE1445}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "应用", "应用.csproj", "{C6620178-47A4-40AA-B29B-AEC485EE1445}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
