@@ -15,7 +15,7 @@ namespace 数据库扩展
         private void 执行任务4()
         {
             var 连接串= 数源.生成连接串(数源种类.OleDb,"Microsoft.Jet.Oledb.4.0",null,@"c:\MyData\Workgroup.mdb","cailin","123456");
-            var 类别 = 数源.命令器(数源种类.Excel)?.ToString();
+            var 类别 = 数源.命令器(数源种类.MySql)?.ToString();
             MessageBox.Show(类别, "OleDbConnection");
         }
 

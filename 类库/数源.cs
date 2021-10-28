@@ -20,8 +20,46 @@ namespace 数据库扩展.类库
         SQLite,
         NullSql
     }
-    class 数源
+    public class 数源
     {
+        private System.Data.DataRow 关联记录;
+        private string 关联快照;
+
+
+        private DbProviderFactory 当前工厂;
+        private DbCommand 当前命令器;
+        private DbCommandBuilder 当前命令串生成器;
+        private DbConnection 当前连接器;
+        private DbConnectionStringBuilder 当前连接串生成器;
+        private DbDataAdapter 当前适配器;
+        private DbParameter 当前参数;
+        public bool 数源存在 { get; }
+        public bool 数源在线 { get; }
+
+
+        private void 设置(数源种类 源类型)
+        {
+            if (数源种类.NullSql == 源类型) return;
+            当前工厂 = 提供者(源类型);
+            当前命令器 = 当前工厂?.CreateCommand();
+            当前命令串生成器 = 当前工厂?.CreateCommandBuilder();
+            当前连接器 = 当前工厂?.CreateConnection();
+            当前连接串生成器 = 当前工厂?.CreateConnectionStringBuilder();
+            当前适配器 = 当前工厂?.CreateDataAdapter();
+            当前参数 = 当前工厂?.CreateParameter();
+        }
+        public 数源(数源种类 源类型)
+        {
+            设置(源类型);
+        }
+        public 数源(string 源类型)
+        {
+            if (String.IsNullOrEmpty(源类型)) return;
+            数源种类 Result;
+            if (Enum.TryParse<数源种类>(源类型, out Result)) 设置(Result);
+        }
+
+
         public static DbProviderFactory 提供者(数源种类 源类型)
         {
             return 源类型 switch
@@ -41,12 +79,13 @@ namespace 数据库扩展.类库
         }
         private static 数源种类 转枚举(string 源类型)
         {
-            if(String.IsNullOrEmpty(源类型)) return 数源种类.NullSql;
+            if (String.IsNullOrEmpty(源类型)) return 数源种类.NullSql;
             数源种类 Result;
-            if(Enum.TryParse<数源种类>(源类型, out Result)) return Result;
+            if (Enum.TryParse<数源种类>(源类型, out Result)) return Result;
             else return 数源种类.NullSql;
         }
         public static DbCommand 命令器(数源种类 源类型) => 提供者(源类型)?.CreateCommand();
+        //public static DbCommandBuilder 命令生成器(DbProviderFactory 当前工厂) => 当前工厂?.CreateCommandBuilder();
         public static DbCommandBuilder 命令生成器(数源种类 源类型) => 提供者(源类型)?.CreateCommandBuilder();
         public static DbConnection 连接器(数源种类 源类型) => 提供者(源类型)?.CreateConnection();
         public static DbConnectionStringBuilder 连接串生成器(数源种类 源类型) => 提供者(源类型)?.CreateConnectionStringBuilder();
@@ -72,7 +111,7 @@ namespace 数据库扩展.类库
             builder["Initial Catalog"] = 数据库;
 
             //信任连接设置："Integrated Security"，"Trusted_Connection"
-            if(集成验证)
+            if (集成验证)
             {
                 builder["Integrated Security"] = "SSIP";
             }
@@ -90,7 +129,7 @@ namespace 数据库扩展.类库
 
         public static DbConnection 连接器(String 源类型, String 连接串)
         {
-            if(String.IsNullOrEmpty(源类型) || String.IsNullOrEmpty(连接串)) return null;
+            if (String.IsNullOrEmpty(源类型) || String.IsNullOrEmpty(连接串)) return null;
 
             var conn = 连接器(转枚举(源类型));
             conn.ConnectionString = 连接串;
@@ -98,7 +137,7 @@ namespace 数据库扩展.类库
         }
         public static DbCommand 命令器(String 源类型, String 命令串)
         {
-            if(String.IsNullOrEmpty(源类型) || String.IsNullOrEmpty(命令串)) return null;
+            if (String.IsNullOrEmpty(源类型) || String.IsNullOrEmpty(命令串)) return null;
 
             var comm = 命令器(转枚举(源类型));
             comm.CommandText = 命令串;
@@ -106,7 +145,7 @@ namespace 数据库扩展.类库
         }
         public static DbCommand 命令器(String 源类型, String 连接串, String 命令串)
         {
-            if(String.IsNullOrEmpty(源类型) || String.IsNullOrEmpty(连接串) || String.IsNullOrEmpty(命令串)) return null;
+            if (String.IsNullOrEmpty(源类型) || String.IsNullOrEmpty(连接串) || String.IsNullOrEmpty(命令串)) return null;
 
             var conn = 连接器(源类型, 连接串);
             var comm = conn.CreateCommand();
@@ -115,10 +154,10 @@ namespace 数据库扩展.类库
         }
         public static DbDataAdapter 适配器(String 源类型, String 连接串, String 命令串)
         {
-            if(String.IsNullOrEmpty(源类型) || String.IsNullOrEmpty(连接串) || String.IsNullOrEmpty(命令串)) return null;
+            if (String.IsNullOrEmpty(源类型) || String.IsNullOrEmpty(连接串) || String.IsNullOrEmpty(命令串)) return null;
 
             var adapter = 适配器(转枚举(源类型));
-            var comm = 命令器( 源类型,  连接串,  命令串);
+            var comm = 命令器(源类型, 连接串, 命令串);
             adapter.SelectCommand = comm;
             var cmdb = 命令生成器(转枚举(源类型));
             cmdb.DataAdapter = adapter;
